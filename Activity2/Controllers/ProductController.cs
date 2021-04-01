@@ -31,6 +31,36 @@ namespace Activity2.Controllers
             return View();
         }
 
+        public IActionResult ShowDetails(int id)
+        {
+            ProductDAO products = new ProductDAO();
+            ProductModel foundProduct = products.GetProductById(id);
+            return View(foundProduct);
+        }
+
+        public IActionResult Edit(int id)
+        {
+            ProductDAO products = new ProductDAO();
+            ProductModel foundProduct = products.GetProductById(id);
+            return View("ShowEdit", foundProduct);
+        }
+
+        public IActionResult ProcessEdit(ProductModel product)
+        {
+            ProductDAO products = new ProductDAO();
+            products.Update(product);
+            return View("Index", products.GetAllProducts());
+        }
+
+        public IActionResult Delete(int id)
+        {
+            ProductDAO products = new ProductDAO();
+            ProductModel product = products.GetProductById(id);
+            products.Delete(product);
+            return View("Index", products.GetAllProducts());
+        }
+
+
         public IActionResult Message()
         {
             return View("message");

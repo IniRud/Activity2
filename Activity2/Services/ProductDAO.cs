@@ -12,7 +12,27 @@ namespace Activity2.Services
         string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Test1;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
         public int Delete(ProductModel product)
         {
-            throw new NotImplementedException();
+            int newIdNumber = -1;
+
+            string sqlStatement = "DELETE FROM dbo.Products WHERE Id = @Id";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand sqlCommand = new SqlCommand(sqlStatement, connection);
+                // prepared statement elaboration
+
+                sqlCommand.Parameters.AddWithValue("@Id", product.Id);
+                try
+                {
+                    connection.Open();
+
+                    newIdNumber = Convert.ToInt32(sqlCommand.ExecuteScalar());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            return newIdNumber;
         }
 
         public List<ProductModel> GetAllProducts()
@@ -43,7 +63,29 @@ namespace Activity2.Services
 
         public ProductModel GetProductById(int id)
         {
-            throw new NotImplementedException();
+            ProductModel foundProduct = null;
+
+            string sqlStatement = "SELECT * FROM dbo.Products WHERE Id = @Id";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand sqlCommand = new SqlCommand(sqlStatement, connection);
+                // prepared statement elaboration
+                sqlCommand.Parameters.AddWithValue("@Id", id);
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = sqlCommand.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        foundProduct = new ProductModel { Id = (int)reader[0], Name = (string)reader[1], Price = (decimal)reader[2], Description = (string)reader[3] };
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            return foundProduct;
         }
 
         public int Insert(ProductModel product)
@@ -80,7 +122,29 @@ namespace Activity2.Services
 
         public int Update(ProductModel product)
         {
-            throw new NotImplementedException();
+            int newIdNumber = -1;
+
+            string sqlStatement = "UPDATE dbo.Products SET Name = @Name, Price = @Price, Description = @Description WHERE Id = @Id";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand sqlCommand = new SqlCommand(sqlStatement, connection);
+                // prepared statement elaboration
+                sqlCommand.Parameters.AddWithValue("@Name", product.Name);
+                sqlCommand.Parameters.AddWithValue("@Price", product.Price);
+                sqlCommand.Parameters.AddWithValue("@Description", product.Description);
+                sqlCommand.Parameters.AddWithValue("@Id", product.Id);
+                try
+                {
+                    connection.Open();
+
+                    newIdNumber = Convert.ToInt32(sqlCommand.ExecuteScalar());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            return newIdNumber;
         }
     }
 }
